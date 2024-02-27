@@ -12,7 +12,7 @@ const Drag = () => {
     for (const file of files) {
       const extension = file.name.split('.').pop().toLowerCase();
 
-      if (extension === 'xlsx') {
+      if (extension === 'xls') {
         // Handle Excel filess
         const reader = new FileReader();
         reader.onload = (e) => {
