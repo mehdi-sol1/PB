@@ -36,34 +36,26 @@ const Drag = () => {
     }
   };
 
- // Function to filter entries based on time criteria
-const cleanEntries = (data) => {
-  // Assuming the timestamp is in the first column, adjust as needed
-  const timestampColumn = 0;
+  // Function to filter entries based on time criteria
+  const cleanEntries = (data) => {
+    // Assuming the timestamp is in the first column, adjust as needed
+    const timestampColumn = 0;
 
-  // Console log to check the original data
-  console.log('Original Data:', data);
+    // Filter entries based on time criteria (adjust time values as needed)
+    const cleanedData = data.filter((entry) => {
+      const timestamp = new Date(entry[timestampColumn]);
 
-  // Filter entries based on time criteria (adjust time values as needed)
-  const cleanedData = data.filter((entry) => {
-    const timestamp = new Date(entry[0]);
+      const entryTime = timestamp.getHours() * 60 + timestamp.getMinutes();
 
-    // Console log to check timestamp values
-    console.log('Timestamp:', timestamp);
-
-    const entryTime = timestamp.getHours() * 60 + timestamp.getMinutes();
-    console.log("ENTRYYYYY TIMEEEE :"+entryTime);
-    return (
-      (entryTime >= 7 * 60 + 45 && entryTime <= 8 * 60 + 15) || // Morning entry
-      (entryTime >= 15 * 60 + 50 && entryTime <= 16 * 60 + 15) // Afternoon exit
-    );
-  });
-
-  // Console log to check the cleaned data
-  console.log('Cleaned Data:', cleanedData);
-
-  return cleanedData;
-};
+      return (
+        (entryTime >= 7 * 60 + 45 && entryTime <= 8 * 60 + 15) || // Morning entry
+        (entryTime >= 15 * 60 + 50 && entryTime <= 16 * 60 + 15) // Afternoon exit
+      );
+    });
+    console.log(cleanedData);
+    return cleanedData;
+    
+  };
 
   
 
