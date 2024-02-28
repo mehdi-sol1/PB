@@ -7,10 +7,10 @@ export default {
   theme: {
     extend: {
       backgroundColor: {
-        gradient: 'linear-gradient(to right, #ff00ff, #00ff00)', // Adjust colors as needed
+        gradient: 'linear-gradient(to right, #ff00ff, #00ff00)',
       },
       textColor: {
-        gradient: 'linear-gradient(to right, #ff00ff, #00ff00)', // Adjust colors as needed
+        gradient: 'linear-gradient(to right, #ff00ff, #00ff00)', 
       },
       fontFamily:
       {

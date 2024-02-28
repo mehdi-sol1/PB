@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { FaFileUpload } from 'react-icons/fa';
 
 const Drag = () => {
   const [cleanedData, setCleanedData] = useState(null);
@@ -107,18 +108,19 @@ const downloadExcel = () => {
 
   return (
     <div
-      className="flex items-center justify-center h-screen bg-green-800"
+      className="flex items-center justify-center h-screen bg-blue-800"
       onDragOver={(event) => event.preventDefault()}
       onDrop={handleDrop}
     >
-      <div className="bg-white p-8 w-[65%] h-[55%] border-[20px] border-yellow-600 rounded-lg shadow-md justify-center">
+      <div className="bg-white p-8 w-[65%] h-[55%] border-[10px] border-dashed border-yellow-500  rounded-lg shadow-md flex justify-center items-center">
         
-        <h1 className="text-2xl flex  items-center justify-center font-semibold mb-4">Drag and Drop Excel Files</h1>
-        <div className="border-dashed h-[90%] border-2 rounded-3xl border-blue-600 p-6 text-center flex justify-center items-center">
-          
-            <p className='text-3xl'></p>
-         
-        </div>
+          <div className='rounded-full bg-white border-gray-200 border-2'>
+            <FaFileUpload className='mb-6 text-blue-400' size={150} />
+          </div>
+          <h1 className='text-2xl md:text-5xl text-blue-400 font-bold'>
+            Drag and Drop Files here (.csv)
+          </h1>
+        
       </div>
     </div>
   );
