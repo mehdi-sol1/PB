@@ -107,15 +107,16 @@ const downloadExcel = () => {
 
   return (
     <div
-      className="flex items-center justify-center h-screen bg-gray-200"
+      className="flex items-center justify-center h-screen bg-green-800"
       onDragOver={(event) => event.preventDefault()}
       onDrop={handleDrop}
     >
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-2xl font-semibold mb-4">Drag and Drop Excel Files</h1>
-        <div className="border-dashed border-2 border-gray-400 p-6 text-center">
+      <div className="bg-white p-8 w-[65%] h-[55%] border-[20px] border-yellow-600 rounded-lg shadow-md justify-center">
+        
+        <h1 className="text-2xl flex  items-center justify-center font-semibold mb-4">Drag and Drop Excel Files</h1>
+        <div className="border-dashed h-[90%] border-2 rounded-3xl border-blue-600 p-6 text-center flex justify-center items-center">
           
-            <p>Drop your Excel file here.</p>
+            <p className='text-3xl'></p>
          
         </div>
       </div>
