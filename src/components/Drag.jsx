@@ -108,17 +108,17 @@ const downloadExcel = () => {
 
   return (
     <div
-      className="flex items-center justify-center h-screen bg-blue-800"
+      className="flex items-center justify-center h-screen bg-white"
       onDragOver={(event) => event.preventDefault()}
       onDrop={handleDrop}
     >
-      <div className="bg-white p-8 w-[65%] h-[55%] border-[10px] border-dashed border-yellow-500  rounded-lg shadow-md flex justify-center items-center">
+      <div className="bg-white p-8 w-[65%] h-[55%] border-[8px] border-dashed border-blue-500  rounded-lg shadow-md flex justify-center items-center">
         
           <div className='rounded-full bg-white border-gray-200 border-2'>
             <FaFileUpload className='mb-6 text-blue-400' size={150} />
           </div>
           <h1 className='text-2xl md:text-5xl text-blue-400 font-bold'>
-            Drag and Drop Files here (.csv)
+            Drag and Drop Files Here (.xslx  .xls  .csv)
           </h1>
         
       </div>
