@@ -1,0 +1,105 @@
+import React, { useState } from 'react';
+import XLSX from 'xlsx/dist/xlsx.full.min.js';
+
+const Drag = () => {
+  const [cleanedData, setCleanedData] = useState(null);
+
+  const handleDrop = async (event) => {
+    event.preventDefault();
+
+    const files = event.dataTransfer.files;
+
+    for (const file of files) {
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      if (extension === 'xlsx' || extension === 'csv'|| extension === 'xls') {
+        // Handle Excel files
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, dateNF: 'yyyy-mm-dd HH:mm:ss' });
+
+          // Clean the data
+          const cleanedData = cleanData(rawData);
+          setCleanedData(cleanedData);
+
+          console.log('Cleaned Data:', cleanedData);
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        console.log('Unsupported file format. Please drop an Excel file.');
+      }
+    }
+  };
+
+  
+
+  // Function to clean the data
+const cleanData = (rawData) => {
+  const cleanedData = [];
+  const workerScans = {};
+
+  for (const row of rawData) {
+    const workerId = row[1]; // Assuming the worker ID is in the 2nd column
+    const date = row[0].split(' ')[0]; // Extracting date from the timestamp
+
+    if (!workerScans[workerId]) {
+      workerScans[workerId] = {};
+    }
+
+    if (!workerScans[workerId][date]) {
+      // First scan of the day
+      workerScans[workerId][date] = [row]; // Use an array to store multiple scans on the same day
+    } else {
+      // Add additional scans of the day
+      workerScans[workerId][date].push(row);
+    }
+  }
+
+  // Convert the workerScans object into an array, keeping only the first and last scan of each day
+  for (const workerId in workerScans) {
+    for (const date in workerScans[workerId]) {
+      const scansOfDay = workerScans[workerId][date];
+      if (scansOfDay.length > 1) {
+        // If there are multiple scans on the same day, keep only the first and last
+        cleanedData.push(scansOfDay[0], scansOfDay[scansOfDay.length - 1]);
+      } else {
+        // If there is only one scan on the day, keep it
+        cleanedData.push(scansOfDay[0]);
+      }
+    }
+  }
+
+  console.log(cleanedData);
+  return cleanedData;
+};
+
+
+
+  return (
+    <div
+      className="flex items-center justify-center h-screen bg-gray-200"
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={handleDrop}
+    >
+      <div className="bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-2xl font-semibold mb-4">Drag and Drop Excel Files</h1>
+        <div className="border-dashed border-2 border-gray-400 p-6 text-center">
+          {/*cleanedData ? (
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Cleaned Data:</h2>
+              <pre>{JSON.stringify(cleanedData, null, 2)}</pre>
+            </div>
+          ) : (
+            <p>Drop your Excel file here.</p>
+          )*/}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Drag;

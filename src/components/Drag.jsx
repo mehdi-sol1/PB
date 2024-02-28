@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import XLSX from 'xlsx/dist/xlsx.full.min.js';
-import { saveAs } from 'file-saver';
+import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
+
 const Drag = () => {
-  const [excelData, setExcelData] = useState(null);
+  const [cleanedData, setCleanedData] = useState(null);
+
+  useEffect(() => {
+    if (cleanedData) {
+      downloadExcel();
+    }
+  }, [cleanedData]);
 
   const handleDrop = async (event) => {
     event.preventDefault();
@@ -12,22 +18,21 @@ const Drag = () => {
     for (const file of files) {
       const extension = file.name.split('.').pop().toLowerCase();
 
-      if (extension === 'xls' || extension === 'xlsx' || extension === 'csv') {
+      if (extension === 'xlsx' || extension === 'csv' || extension === 'xls') {
+        // Handle Excel files
         const reader = new FileReader();
         reader.onload = (e) => {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
-          const result = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, dateNF: 'yyyy-mm-dd HH:mm:ss' });
+          console.log('OLD Data:', rawData);
+          // Clean the data
+          const cleanedData = cleanData(rawData);
+          setCleanedData(cleanedData);
 
-          // Process the data and filter entries based on time criteria
-          const cleanedData = cleanEntries(result);
-
-          // Create a new CSV file with the cleaned data
-          createCleanedCSV(cleanedData);
-
-          setExcelData(cleanedData);
+          console.log('Cleaned Data:', cleanedData);
         };
         reader.readAsArrayBuffer(file);
       } else {
@@ -36,50 +41,68 @@ const Drag = () => {
     }
   };
 
- // Function to filter entries based on time criteria
-const cleanEntries = (data) => {
-  // Assuming the timestamp is in the first column, adjust as needed
-  const timestampColumn = 0;
+  // Function to clean the data
+  const cleanData = (rawData) => {
+    const cleanedData = [];
+    const workerScans = {};
 
-  // Console log to check the original data
-  console.log('Original Data:', data);
+    for (const row of rawData) {
+      const workerId = row[1]; // Assuming the worker ID is in the 2nd column
+      const date = row[0].split(' ')[0]; // Extracting date from the timestamp
 
-  // Filter entries based on time criteria (adjust time values as needed)
-  const cleanedData = data.filter((entry) => {
-    const timestamp = new Date(entry[0]);
+      if (!workerScans[workerId]) {
+        workerScans[workerId] = {};
+      }
 
-    // Console log to check timestamp values
-    console.log('Timestamp:', timestamp);
+      if (!workerScans[workerId][date]) {
+        // First scan of the day
+        workerScans[workerId][date] = [row]; // Use an array to store multiple scans on the same day
+      } else {
+        // Add additional scans of the day
+        workerScans[workerId][date].push(row);
+      }
+    }
 
-    const entryTime = timestamp.getHours() * 60 + timestamp.getMinutes();
-    console.log("ENTRYYYYY TIMEEEE :"+entryTime);
-    return (
-      (entryTime >= 7 * 60 + 45 && entryTime <= 8 * 60 + 15) || // Morning entry
-      (entryTime >= 15 * 60 + 50 && entryTime <= 16 * 60 + 15) // Afternoon exit
-    );
-  });
+    // Convert the workerScans object into an array, keeping only the first and last scan of each day
+    for (const workerId in workerScans) {
+      for (const date in workerScans[workerId]) {
+        const scansOfDay = workerScans[workerId][date];
+        if (scansOfDay.length > 1) {
+          // If there are multiple scans on the same day, keep only the first and last
+          cleanedData.push(scansOfDay[0], scansOfDay[scansOfDay.length - 1]);
+        } else {
+          // If there is only one scan on the day, keep it
+          cleanedData.push(scansOfDay[0]);
+        }
+      }
+    }
 
-  // Console log to check the cleaned data
-  console.log('Cleaned Data:', cleanedData);
+    console.log(cleanedData);
+    return cleanedData;
+  };
 
-  return cleanedData;
-};
-
-  
-
-/// Function to create a new Excel file with the cleaned data
-const createCleanedCSV = (cleanedData) => {
-  // Create a worksheet
-  const ws = XLSX.utils.aoa_to_sheet(cleanedData);
-
-  // Create a new workbook and append the sheet
+// Function to download the cleaned data as an Excel file
+const downloadExcel = () => {
+  const ws = XLSX.utils.json_to_sheet(cleanedData);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'CleanedData');
+  XLSX.utils.book_append_sheet(wb, ws, 'Cleaned Data');
+  const blob =XLSX.writeFile(wb, `results.xlsx`);
 
-  // Use the file-saver library to save the workbook as an Excel file
-  XLSX.writeFile(wb, 'cleaned_data.xlsx');
+
+  // Use XLSX.write to generate a blob
+  //const blob = XLSX.write(wb, { bookType: 'xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  // Create a Blob object and initiate the download
+  const blobObject = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(blobObject);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cleaned_data.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
-
 
 
   return (
@@ -91,15 +114,9 @@ const createCleanedCSV = (cleanedData) => {
       <div className="bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-semibold mb-4">Drag and Drop Excel Files</h1>
         <div className="border-dashed border-2 border-gray-400 p-6 text-center">
-          {/* Display cleaned data or a message */}
-          {excelData ? (
-            <div>
-              <h2 className="text-lg font-semibold mb-2">Cleaned Excel Data:</h2>
-              <pre>{JSON.stringify(excelData, null, 2)}</pre>
-            </div>
-          ) : (
+          
             <p>Drop your Excel file here.</p>
-          )}
+         
         </div>
       </div>
     </div>
