@@ -9,8 +9,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Drag />} />
-        <Route path="/login" element={<Drag />} />
-        <Route path="/drag/:username" element={<Drag />} />
+        <Route path="/drag" element={<Drag />} />
       </Routes>
 
 
