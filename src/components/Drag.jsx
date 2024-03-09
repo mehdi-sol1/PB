@@ -102,7 +102,7 @@ const downloadExcel = () => {
   a.download = 'cleaned_data.xlsx';
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
+  document.body.removeChild(a); a
   URL.revokeObjectURL(url);*/
 };
 
