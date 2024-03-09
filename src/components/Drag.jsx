@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { FaFileUpload } from 'react-icons/fa';
+import Employee from './Employee';
 
 const Drag = () => {
   const [cleanedData, setCleanedData] = useState(null);
@@ -92,7 +93,7 @@ const downloadExcel = () => {
 
   // Use XLSX.write to generate a blob
   //const blob = XLSX.write(wb, { bookType: 'xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
+/*
   // Create a Blob object and initiate the download
   const blobObject = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = URL.createObjectURL(blobObject);
@@ -102,7 +103,7 @@ const downloadExcel = () => {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url);*/
 };
 
 
@@ -119,9 +120,9 @@ const downloadExcel = () => {
           </div>
           <h1 className='text-2xl md:text-5xl text-blue-400 font-bold'>
             Drag and Drop Files Here (.xslx  .xls  .csv)
-          </h1>
-        
+          </h1>       
       </div>
+      <Employee data={cleanedData}/>
     </div>
   );
 };
