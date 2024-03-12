@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdAccountCircle } from 'react-icons/md';
 import userData from '../data/users.json'; 
-import BackGround from '../assets/bglogin.png';
+import BackGround from '../../assets/bglogin.png';
+
 const Login = () => {
   const navigate = useNavigate(); 
   const [username, setUsername] = useState('');
